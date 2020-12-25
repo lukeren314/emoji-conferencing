@@ -21,22 +21,29 @@
                 <button id="startButton">Start</button>
                 <button id="callButton">Call</button>
                 <button id="hangupButton">Hang Up</button>
+                <button id="switchButton">Switch</button>
             </div>
 
             <div id="stats">
                 <h1>Stats:</h1>
-                <p id="send-bitrate">Send Bitrate:</p>
-                <p id="receive-bitrate">Receive Bitrate:</p>
+                <div id="video-stats">
+                    <p id="send-bitrate"></p>
+                    <p id="receive-bitrate"></p>
+                </div>
+                <div id="animated-stats">
+                    <p id="animated-send-bitrate"></p>
+                    <p id="animated-receive-bitrate"></p>
+                </div>
             </div>
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-        <script src="/js/socket.js"></script>
-        <script src="/js/client.js"></script>
-        <script src="/js/model.js"></script>
-        <script src="/js/view.js"></script>
-        <script src="/js/main.js" async></script>
+        <script src="./js/clientSocket.js"></script>
+        <script src="./js/client.js"></script>
+        <script src="./js/model.js"></script>
+        <script src="./js/view.js"></script>
+        <script src="./js/main.js" async></script>
         <!-- <script src="js/main.js" async></script> -->
 
     </body>

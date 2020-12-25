@@ -3,7 +3,7 @@ const DEBUG = true;
 class Model {
   constructor() {
     this.client = new Client(this);
-    this.socket = new Socket(this);
+    this.socket = new ClientSocket(this);
     this.view = null;
   }
 
@@ -15,7 +15,7 @@ class Model {
     this.trace("Getting user media with constraints", mediaStreamConstraints);
 
     if (location.hostname !== "localhost") {
-      requestTurn();
+      this.client.requestTurn();
     }
   }
 
@@ -26,9 +26,13 @@ class Model {
   // Logs an action (text) and the time when it happened on the console.
   trace(...args) {
     if (DEBUG) {
-      let callStack = new Error().stack.split("\n");
-      var callerLine = callStack[callStack.length - 2];
-      console.log(...args, callerLine);
+      if (args.includes("-verbose")) {
+        let callStack = new Error().stack.split("\n");
+        // var callerLine = callStack[callStack.length - 2];
+        console.log(...args);
+      } else {
+        console.log(...args);
+      }
     }
   }
 

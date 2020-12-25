@@ -1,4 +1,4 @@
-class Socket {
+class ClientSocket {
   constructor(model_) {
     this.model = model_;
     this.socket = io.connect();
@@ -11,8 +11,15 @@ class Socket {
     this.socket.on("log", this.onLog.bind(this));
   }
 
+  // add in public methods later
+
+  emit(...args) {
+    this.socket.emit(...args);
+  }
+
   onCreated(room) {
     this.model.trace("Created room " + room);
+    this.model.client.isInitiator = true;
   }
 
   onFull(room) {
@@ -20,24 +27,25 @@ class Socket {
   }
 
   onJoin(room) {
+    console.log("???????");
     this.model.trace("Another peer made a request to join room " + room);
     this.model.trace("This peer is the initiator of room " + room + "!");
     this.model.client.isChannelReady = true;
-    if (this.model.localStream) {
-      this.model.maybeStart();
+    if (this.model.client.localStream) {
+      this.model.client.maybeStart();
     }
   }
 
   onJoined(room) {
     this.model.trace("joined: " + room);
-    this.moedl.client.isChannelReady = true;
-    if (this.model.localStream) {
-      this.model.maybeStart();
+    this.model.client.isChannelReady = true;
+    if (this.model.client.localStream) {
+      this.model.client.maybeStart();
     }
   }
 
   onMessage(message) {
-    this.trace("Client received message:", message);
+    this.model.trace("Client received message:", message);
     if (message === "got user media") {
       this.model.client.maybeStart();
     } else if (message.type === "offer") {
@@ -64,6 +72,6 @@ class Socket {
   }
 
   onLog(array) {
-    this.trace.apply(console, array);
+    this.model.trace.apply(console, array);
   }
 }

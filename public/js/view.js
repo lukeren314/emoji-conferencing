@@ -6,17 +6,24 @@ class View {
     this.startButton = document.getElementById("startButton");
     this.callButton = document.getElementById("callButton");
     this.hangupButton = document.getElementById("hangupButton");
+    this.switchButton = document.getElementById("switchButton");
     this.sendBitRate = document.getElementById("send-bitrate");
-    this.receiveBitRate = document.getElementById("receive-bit-rate");
+    this.receiveBitRate = document.getElementById("receive-bitrate");
+    this.animatedSendBitRate = document.getElementById("animated-send-bitrate");
+    this.animatedReceiveBitRate = document.getElementById(
+      "animated-receive-bitrate"
+    );
 
     // Set up initial action buttons status: disable call and hangup.
     this.callButton.disabled = true;
     this.hangupButton.disabled = true;
+    this.switchButton.disabled = true;
 
     // Add click event handlers for buttons.
     startButton.addEventListener("click", this.startAction.bind(this));
     callButton.addEventListener("click", this.callAction.bind(this));
     hangupButton.addEventListener("click", this.hangupAction.bind(this));
+    switchButton.addEventListener("click", this.switchAction.bind(this));
   }
 
   setModel(model_) {
@@ -35,6 +42,7 @@ class View {
   callAction() {
     this.callButton.disabled = true;
     this.hangupButton.disabled = false;
+    this.switchButton.disabled = false;
 
     this.model.trace("Starting call.");
     //   startTime = window.performance.now();
@@ -48,7 +56,13 @@ class View {
     this.model.client.hangup();
     this.hangupButton.disabled = true;
     this.callButton.disabled = false;
+    this.switchButton.disabled = true;
+
     this.model.trace("Ending call.");
+  }
+
+  switchAction() {
+    this.model.client.switchModes();
   }
 
   setSendBitRate(bps) {
@@ -61,5 +75,17 @@ class View {
     this.receiveBitRate.innerHTML = `Receive BitRate: ${(bps / 1000).toFixed(
       3
     )} kbps`;
+  }
+
+  setAnimatedSendBitRate(bps) {
+    this.animatedSendBitRate.innerHTML = `Send BitRate: ${(bps / 1000).toFixed(
+      3
+    )} kbps`;
+  }
+
+  setAnimatedReceiveBitRate(bps) {
+    this.animatedReceiveBitRate.innerHTML = `Receive BitRate: ${(
+      bps / 1000
+    ).toFixed(3)} kbps`;
   }
 }

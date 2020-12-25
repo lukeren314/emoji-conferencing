@@ -1,7 +1,8 @@
-class Socket {
+class ServerSocket {
   constructor(socket_, io_, secure) {
     this.socket = socket_;
     this.io = io_;
+    this.room = null;
     this.socket.on("message", this.onMessage.bind(this));
     this.socket.on("create-join", this.onCreateJoin.bind(this));
     this.socket.on("ipaddr", this.onIpAddr.bind(this));
@@ -12,6 +13,7 @@ class Socket {
     var array = ["Message from server:"];
     array.push.apply(array, arguments);
     this.socket.emit("log", array);
+    console.log(arguments);
   }
 
   broadcast(...args) {
@@ -46,7 +48,7 @@ class Socket {
     var numClients = clientsInRoom
       ? Object.keys(clientsInRoom.sockets).length
       : 0;
-    this.log("Room " + room + " now has " + numClients + " client(s)");
+    this.log("Room " + room + " starts with ", clientsInRoom);
 
     if (numClients === 0) {
       this.joinRoom(room);
@@ -54,14 +56,17 @@ class Socket {
       this.emit("created", room, this.socket.id);
     } else if (numClients === 1) {
       this.log("Client ID " + this.socket.id + " joined room " + room);
-      this.roomEmit("join", room);
       this.joinRoom(room);
+      this.roomEmit("join", room);
       this.emit("joined", room, this.socket.id);
       this.roomEmit("ready");
     } else {
       // max two clients
       this.emit("full", room);
     }
+
+    var clientsInRoom = this.io.sockets.adapter.rooms[room];
+    this.log("Room " + room + " now has ", clientsInRoom);
   }
 
   onIpAddr() {
@@ -77,7 +82,10 @@ class Socket {
 
   onClose() {
     this.log("received bye");
+    if (this.room) {
+      this.socket.leave(this.room);
+    }
   }
 }
 
-module.exports = Socket;
+module.exports = ServerSocket;
