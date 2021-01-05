@@ -3,6 +3,11 @@ const peerConnectionConfig = {
     {
       urls: "stun:stun.l.google.com:19302",
     },
+    {
+      urls: "turn:xxx.xxx.xxx.xxx:3478",
+      username: "test",
+      password: "test",
+    },
   ],
 };
 

@@ -7,3 +7,4 @@ package-lock.json
 *.key
 .env
 bfg.jar
+*.pem
