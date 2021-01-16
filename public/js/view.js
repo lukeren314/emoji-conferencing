@@ -32,18 +32,12 @@ class View {
 
   // Handles start button action: creates local MediaStream.
   startAction() {
-    startButton.disabled = true;
-
     this.model.client.getStream();
     this.model.trace("Requesting local stream.");
   }
 
   // Handles call button action: creates peer connection.
   callAction() {
-    this.callButton.disabled = true;
-    this.hangupButton.disabled = false;
-    this.switchButton.disabled = false;
-
     this.model.trace("Starting call.");
     //   startTime = window.performance.now();
 

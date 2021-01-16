@@ -4,7 +4,7 @@ const peerConnectionConfig = {
       urls: "stun:stun.l.google.com:19302",
     },
     {
-      urls: "turn:xxx.xxx.xxx.xxx:3478",
+      urls: "turn:turn.xxx.xxx.xxx.xxx:3478",
       username: "test",
       password: "test",
     },
@@ -76,11 +76,13 @@ class Client {
   getStream() {
     console.log(mediaStreamConstraints);
     let callback = this.gotStream.bind(this);
+    let callback2 = this.gotStreamFailed.bind(this);
     navigator.mediaDevices
       .getUserMedia(mediaStreamConstraints)
       .then(callback)
       .catch(function (e) {
         console.log("getUserMedia() error: ", e);
+        gotStreamFailed();
       });
   }
 
@@ -88,8 +90,16 @@ class Client {
     this.localStream = stream;
     this.model.view.localVideo.srcObject = stream;
     this.model.view.callButton.disabled = false; // Enable call button.
+    this.model.view.startButton.disabled = true;
 
     this.sendMessage("got user media");
+  }
+
+  gotStreamFailed(stream) {
+    this.localStream = MediaStream();
+    this.model.view.localVideo.srcObject = stream;
+    this.model.view.callButton.disabled = false; // Enable call button.
+    this.model.view.startButton.disabled = true;
   }
 
   maybeStart() {
@@ -112,6 +122,10 @@ class Client {
       if (this.isInitiator) {
         this.doCall();
       }
+
+      this.model.view.callButton.disabled = true;
+      this.model.view.hangupButton.disabled = false;
+      this.model.view.switchButton.disabled = false;
     }
   }
 
@@ -193,23 +207,22 @@ class Client {
     }
     if (!turnExists) {
       this.model.trace("no turn server found");
-      // const proxyurl = "https://cors-anywhere.herokuapp.com/";
-      // this.trace("Getting TURN server from ", proxyurl, turnURL);
-      // // No TURN server. Get one from computeengineondemand.appspot.com:
-      // var xhr = new XMLHttpRequest();
-      // xhr.onreadystatechange = function () {
-      //   if (xhr.readyState === 4 && xhr.status === 200) {
-      //     var turnServer = JSON.parse(xhr.responseText);
-      //     this.trace("Got TURN server: ", turnServer);
-      //     peerConnectionConfig.iceServers.push({
-      //       urls: "turn:" + turnServer.username + "@" + turnServer.turn,
-      //       credential: turnServer.password,
-      //     });
-      //     turnReady = true;
-      //   }
-      // };
-      // xhr.open("GET", proxyurl + turnURL, true);
-      // xhr.send();
+      this.trace("Getting TURN server from ", turnURL);
+      // No TURN server. Get one from computeengineondemand.appspot.com:
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var turnServer = JSON.parse(xhr.responseText);
+          this.trace("Got TURN server: ", turnServer);
+          peerConnectionConfig.iceServers.push({
+            urls: "turn:" + turnServer.username + "@" + turnServer.turn,
+            credential: turnServer.password,
+          });
+          turnReady = true;
+        }
+      };
+      xhr.open("GET", turnURL, true);
+      xhr.send();
     }
   }
 
